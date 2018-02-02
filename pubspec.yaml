@@ -1,0 +1,14 @@
+name: fluttie
+description: Easily display stunning Lottie animations in flutter.
+version: 0.0.1
+author:
+homepage:
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+flutter:
+  plugin:
+    androidPackage: de.simolus3.fluttie
+    pluginClass: FluttiePlugin
