@@ -36,7 +36,7 @@ public class FluttiePlugin implements MethodCallHandler, EventChannel.StreamHand
 	private SparseArray<LottieComposition> loadedCompositions = new SparseArray<>();
 	private AtomicInteger compositionRequestCounter = new AtomicInteger();
 
-	private RenderingThread renderingThread;
+	private RenderingThreads renderingThreads;
 
 	private FluttiePlugin(Registrar registrar) {
 		this.registrar = registrar;
@@ -49,8 +49,17 @@ public class FluttiePlugin implements MethodCallHandler, EventChannel.StreamHand
 		channel.setMethodCallHandler(this);
 		eventChannel.setStreamHandler(this);
 
-		renderingThread = new RenderingThread();
-		renderingThread.start();
+		/*
+		 When multiple threads are working on rendering multiple animations simultaneously, at some
+		 we will inevitably send two texture updates to the flutter engine with a really short time
+		 delay in between. This, as it seems, will crash the engine :(
+		 There is an issue that could be related to this, https://github.com/flutter/flutter/issues/14169
+		 that we're waiting on to be fixed. After that is fixed, we can enable multithreaded rendering,
+		 this code should otherwise work. If it still crashes, we can still take a look into that
+		 later on and report a new issue to the Flutter team.
+		 */
+		renderingThreads = new RenderingThreads(1);
+		renderingThreads.start();
 	}
 
 	private FluttieAnimation getManagedAnimation(MethodCall call) {
@@ -58,8 +67,8 @@ public class FluttiePlugin implements MethodCallHandler, EventChannel.StreamHand
 		return managedAnimations.get(id);
 	}
 
-	public RenderingThread getRenderingThread() {
-		return renderingThread;
+	public RenderingThreads getRenderingThreads() {
+		return renderingThreads;
 	}
 
 	@Override
@@ -103,7 +112,7 @@ public class FluttiePlugin implements MethodCallHandler, EventChannel.StreamHand
 				FluttieAnimation animation = new FluttieAnimation(this, texture, composition);
 				animation.setRepeatOptions(repeatCount, repeatMode);
 				if (durationMillis > 0)
-					animation.setDuration(durationMifllis);
+					animation.setDuration(durationMillis);
 
 				managedAnimations.put((int) texture.id(), animation);
 				result.success(texture.id());
@@ -125,6 +134,8 @@ public class FluttiePlugin implements MethodCallHandler, EventChannel.StreamHand
 				FluttieAnimation anim = getManagedAnimation(call);
 				anim.stopAndRelease();
 				managedAnimations.remove(anim.getId());
+				//if scheduled to be drawn, cancel
+				renderingThreads.getQueue().removeAnimation(anim);
 				result.success(null);
 				return;
 			default:

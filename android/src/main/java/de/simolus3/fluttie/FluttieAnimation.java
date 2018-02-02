@@ -21,7 +21,6 @@ public class FluttieAnimation implements ValueAnimator.AnimatorUpdateListener {
 	private final TextureRegistry.SurfaceTextureEntry surfaceTexture;
 
 	private boolean playing;
-	private boolean skipDrawing;
 
 	private LottieComposition composition;
 	private LottieDrawable drawable;
@@ -43,7 +42,7 @@ public class FluttieAnimation implements ValueAnimator.AnimatorUpdateListener {
 
 		drawable.addAnimatorUpdateListener(this);
 
-		plugin.getRenderingThread().markDirty(this);
+		plugin.getRenderingThreads().markDirty(this);
 	}
 
 	void setRepeatOptions(int repeatCount, int repeatMode) {
@@ -60,22 +59,23 @@ public class FluttieAnimation implements ValueAnimator.AnimatorUpdateListener {
 		return (int) surfaceTexture.id();
 	}
 
-	public void drawSync() {
-		if (skipDrawing)
-			return;
+	public Canvas lockCanvas() {
+		return surface.lockCanvas(null);
+	}
 
-		Canvas canvas = surface.lockCanvas(null);
+	public void drawFrame(Canvas canvas) {
 		//would otherwise draw frames on top of older frames
 		canvas.drawColor(BACKGROUND_COLOR, PorterDuff.Mode.CLEAR);
-
 		drawable.draw(canvas);
+	}
 
+	public void unlockCanvasAndPost(Canvas canvas) {
 		surface.unlockCanvasAndPost(canvas);
 	}
 
 	@Override
 	public void onAnimationUpdate(@Nullable ValueAnimator valueAnimator) {
-		plugin.getRenderingThread().markDirty(this);
+		plugin.getRenderingThreads().markDirty(this);
 	}
 
 	public boolean isPlaying() {
@@ -83,9 +83,7 @@ public class FluttieAnimation implements ValueAnimator.AnimatorUpdateListener {
 	}
 
 	public void startAnimation() {
-		skipDrawing = true;
 		stopAnimation(true);
-		skipDrawing = false;
 		drawable.start();
 		playing = true;
 	}
@@ -107,7 +105,6 @@ public class FluttieAnimation implements ValueAnimator.AnimatorUpdateListener {
 	}
 
 	public void stopAndRelease() {
-		skipDrawing = true;
 		stopAnimation(false);
 
 		drawable.clearComposition();
