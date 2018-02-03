@@ -29,16 +29,17 @@ public class FluttieAnimation implements ValueAnimator.AnimatorUpdateListener {
 
 	private Surface surface;
 
-	public FluttieAnimation(FluttiePlugin plugin, TextureRegistry.SurfaceTextureEntry surfaceTexture, LottieComposition composition) {
+	public FluttieAnimation(FluttiePlugin plugin, TextureRegistry.SurfaceTextureEntry surfaceTexture, LottieComposition composition, float scale) {
 		this.plugin = plugin;
 		this.surfaceTexture = surfaceTexture;
 
 		surface = new Surface(surfaceTexture.surfaceTexture());
 		Rect bounds = composition.getBounds();
-		surfaceTexture.surfaceTexture().setDefaultBufferSize(bounds.width(), bounds.height());
-
+		surfaceTexture.surfaceTexture().setDefaultBufferSize(
+				(int) scale * bounds.width(), (int) scale * bounds.height());
 
 		drawable = new LottieDrawable();
+		drawable.setScale(scale);
 		this.composition = composition;
 		drawable.setComposition(composition);
 

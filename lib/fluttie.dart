@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:ui' show window;
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter/services.dart';
@@ -15,7 +16,7 @@ class FluttieAnimation extends StatelessWidget {
   /// is the libraries fault and it should be fixed in the future.
   final Size size;
 
-  FluttieAnimation(this.data, {this.size = const Size.square(100.0)});
+  FluttieAnimation(this.data, {this.size = Fluttie.kDefaultSize});
 
   Widget build(BuildContext ctx) {
     return data == null ? 
@@ -82,6 +83,9 @@ class RepeatCount {
 }
 
 class Fluttie {
+
+  static const Size kDefaultSize = const Size.square(100.0);
+
   /// Returns true iff the backend is ready to play animations
   static Future<bool> isAvailable() {
     return _methods.invokeMethod("isAvailable");
@@ -100,22 +104,36 @@ class Fluttie {
 
   /// Given the composition of an animation to display, create a new animation
   /// with detailed settings like its duration or how it should repeat.
+  /// 
+  /// The parameter preferredSize controlls the size at which the animation
+  /// should be rendered natively before being submitted to the flutter frontend.
+  /// When smaller compositions are drawn to bigger widgets without setting
+  /// preparedSize, the resulting animation will be of low quality as aliasing
+  /// occurs while scaling. Note that, even though using a big preferredSize
+  /// reduces that effect, it can reduce the performance of rendering animations.
+  /// By default, animations won't be scaled and use the size defined in the
+  /// Lottie definition, no matter at what size they will be displayed.
   Future<FluttieAnimationController> prepareAnimation (
     int preparationId, 
     {
       RepeatMode repeatMode = RepeatMode.START_OVER,
       RepeatCount repeatCount = const RepeatCount.nTimes(0),
       Duration duration,
+      Size preferredSize,
     }) async {
-    int animId = await _methods
-        .invokeMethod("prepareAnimation", 
-        {
-          "composition": preparationId,
-          "repeat_count": repeatCount._internalCount,
-          "repeat_reverse": repeatMode == RepeatMode.REVERSE,
-          "duration": duration?.inMilliseconds ?? 0,
-        }
-    );
+      var scale = window.devicePixelRatio;
+
+      int animId = await _methods
+          .invokeMethod("prepareAnimation", 
+          {
+            "composition": preparationId,
+            "repeat_count": repeatCount._internalCount,
+            "repeat_reverse": repeatMode == RepeatMode.REVERSE,
+            "duration": duration?.inMilliseconds ?? 0,
+            "pref_size_h": scale * (preferredSize?.height ?? -1.0),
+            "pref_size_w": scale * (preferredSize?.width ?? - 1.0),
+          }
+      );
 
     return new FluttieAnimationController(animId, this);
   }

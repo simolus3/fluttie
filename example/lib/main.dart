@@ -79,9 +79,16 @@ class _MyAppState extends State<MyApp> {
       bundle: DefaultAssetBundle.of(context)
     );
 
-    // Create the star animation with the default setting. 5 times.
+    // Create the star animation with the default setting. 5 times. The
+    // preferredSize needs to be set because the original star animation is quite
+    // small. See the documentation for the method prepareAnimation for details.
     for (int i = 0; i < 5; i++) {
-      starAnimations.add(await instance.prepareAnimation(composition));
+      starAnimations.add(
+        await instance.prepareAnimation(
+          composition, 
+          preferredSize: Fluttie.kDefaultSize
+        )
+      );
     }
 
     // Loading animations may take quite some time. We should check that the

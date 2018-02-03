@@ -123,10 +123,21 @@ public class FluttiePlugin implements MethodCallHandler, EventChannel.StreamHand
 						ValueAnimator.REVERSE : ValueAnimator.RESTART;
 				int durationMillis = call.argument("duration");
 
+				double preferredWidth = call.argument("pref_size_h");
+				double preferredHeight = call.argument("pref_size_h");
+				float scale = 1;
+				if (preferredWidth > 0 && preferredHeight > 0) {
+					double scaleX = preferredWidth / (float) composition.getBounds().height();
+					double scaleY = preferredHeight / (float) composition.getBounds().width();
+
+					scale = (float) Math.min(scaleX, scaleY);
+				}
+
 				TextureRegistry.SurfaceTextureEntry texture =
 						registrar.textures().createSurfaceTexture();
 
-				FluttieAnimation animation = new FluttieAnimation(this, texture, composition);
+				FluttieAnimation animation = new FluttieAnimation(
+						this, texture, composition, scale);
 				animation.setRepeatOptions(repeatCount, repeatMode);
 				if (durationMillis > 0)
 					animation.setDuration(durationMillis);
