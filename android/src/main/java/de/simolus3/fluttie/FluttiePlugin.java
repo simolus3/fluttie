@@ -1,6 +1,9 @@
 package de.simolus3.fluttie;
 
 import android.animation.ValueAnimator;
+import android.app.Activity;
+import android.app.Application;
+import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.util.SparseArray;
@@ -11,6 +14,8 @@ import com.airbnb.lottie.OnCompositionLoadedListener;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import io.flutter.plugin.common.EventChannel;
@@ -21,8 +26,8 @@ import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.PluginRegistry.Registrar;
 import io.flutter.view.TextureRegistry;
 
-public class FluttiePlugin implements MethodCallHandler, EventChannel.StreamHandler {
-
+public class FluttiePlugin implements MethodCallHandler, EventChannel.StreamHandler, Application.ActivityLifecycleCallbacks {
+	
 	public static void registerWith(Registrar registrar) {
 		FluttiePlugin plugin = new FluttiePlugin(registrar);
 		plugin.setUp();
@@ -49,6 +54,8 @@ public class FluttiePlugin implements MethodCallHandler, EventChannel.StreamHand
 		channel.setMethodCallHandler(this);
 		eventChannel.setStreamHandler(this);
 
+		registrar.activity().getApplication().registerActivityLifecycleCallbacks(this);
+
 		/*
 		 When multiple threads are working on rendering multiple animations simultaneously, at some
 		 we will inevitably send two texture updates to the flutter engine with a really short time
@@ -60,6 +67,16 @@ public class FluttiePlugin implements MethodCallHandler, EventChannel.StreamHand
 		 */
 		renderingThreads = new RenderingThreads(1);
 		renderingThreads.start();
+	}
+
+	private List<FluttieAnimation> getAllManagedAnimations() {
+		List<FluttieAnimation> animations = new ArrayList<>();
+
+		for (int i = 0; i < managedAnimations.size(); i++) {
+			animations.add(managedAnimations.get(managedAnimations.keyAt(i)));
+		}
+
+		return animations;
 	}
 
 	private FluttieAnimation getManagedAnimation(MethodCall call) {
@@ -187,4 +204,45 @@ public class FluttiePlugin implements MethodCallHandler, EventChannel.StreamHand
 				writeToSink(object);
 		}
 	}
+
+	@Override
+	public void onActivityCreated(Activity activity, Bundle savedInstanceState) {}
+
+	@Override
+	public void onActivityStarted(Activity activity) {
+		if (renderingThreads != null) {
+			renderingThreads.start();
+		}
+	}
+
+	@Override
+	public void onActivityResumed(Activity activity) {
+		for (FluttieAnimation anim : getAllManagedAnimations()) {
+			if (anim.isPausedButNotByUser()) {
+				anim.setPausedButNotByUser(false);
+				anim.resumeAnimation();
+			}
+		}
+	}
+
+	@Override
+	public void onActivityPaused(Activity activity) {
+		for (FluttieAnimation anim : getAllManagedAnimations()) {
+			if (anim.isPlaying()) {
+				anim.pauseAnimation();
+				anim.setPausedButNotByUser(true);
+			}
+		}
+	}
+
+	@Override
+	public void onActivityStopped(Activity activity) {
+		renderingThreads.stop();
+	}
+
+	@Override
+	public void onActivitySaveInstanceState(Activity activity, Bundle outState) {}
+
+	@Override
+	public void onActivityDestroyed(Activity activity) {}
 }

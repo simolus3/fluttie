@@ -15,7 +15,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * work as done. This class keeps track of what animations are currently being processed and what
  * still needs to be done.
  */
-public class RenderingQueue {
+class RenderingQueue {
 
 	//Animations waiting to be rendered
 	private LinkedList<FluttieAnimation> backlog = new LinkedList<>();
@@ -29,6 +29,8 @@ public class RenderingQueue {
 	 * Waits for a FluttieAnimation that needs to be drawn and returns it. It makes sure that there
 	 * can never be two FluttieAnimations drawn to at the same time and sends calling Threads in
 	 * idle if there is no work to do.
+	 *
+	 * If this method returns null, it means that the threads should stop.
 	 *
 	 * @return the first FluttieAnimation that needs to be drawn
 	 * @throws InterruptedException if the Thread gets interrupted while waiting
@@ -112,6 +114,19 @@ public class RenderingQueue {
 			lock.lock();
 
 			backlog.remove(animation);
+		} finally {
+			lock.unlock();
+		}
+	}
+
+	/**
+	 * Clears the backlog holding a list of animations that need to be drawn.
+	 */
+	void clearBacklog() {
+		try {
+			lock.lock();
+
+			backlog.clear();
 		} finally {
 			lock.unlock();
 		}

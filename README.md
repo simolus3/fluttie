@@ -17,9 +17,8 @@ Android library into a Flutter texture.
    yet figured out how.
  - Due to a delay between the dart code and the native backend, controlling
    multiple animations can be a bit laggy. Rendering multiple animations will
-   also heavily reduce your apps framerate (Using multiple threads is implemented, but [crashes Flutter](https://github.com/flutter/flutter/issues/14169)).
+   also heavily reduce your apps framerate (Using multiple threads to circumvent this has already been implemented, but [crashes Flutter](https://github.com/flutter/flutter/issues/14169)).
  - Animation widgets need a fixed size for now
- - Todo: Reduce power usage by pausing animations when the app is in background 
 
 ## Getting Started
 

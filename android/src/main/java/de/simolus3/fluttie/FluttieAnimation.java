@@ -22,6 +22,8 @@ public class FluttieAnimation implements ValueAnimator.AnimatorUpdateListener {
 
 	private boolean playing;
 
+	private boolean pausedButNotByUser;
+
 	private LottieComposition composition;
 	private LottieDrawable drawable;
 
@@ -80,6 +82,14 @@ public class FluttieAnimation implements ValueAnimator.AnimatorUpdateListener {
 
 	public boolean isPlaying() {
 		return playing;
+	}
+
+	public boolean isPausedButNotByUser() {
+		return pausedButNotByUser;
+	}
+
+	public void setPausedButNotByUser(boolean pausedButNotByUser) {
+		this.pausedButNotByUser = pausedButNotByUser;
 	}
 
 	public void startAnimation() {

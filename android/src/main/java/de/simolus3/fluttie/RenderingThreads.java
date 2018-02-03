@@ -18,7 +18,8 @@ public class RenderingThreads implements Runnable {
 	private List<Thread> threads = new ArrayList<>();
 	private RenderingQueue queue = new RenderingQueue();
 
-	private volatile boolean shouldEnd = false;
+	private boolean threadsStarted = false;
+	private boolean acceptTasks = false;
 
 	public RenderingThreads(int amount) {
 		for (int i = 0; i < amount; i++) {
@@ -30,31 +31,39 @@ public class RenderingThreads implements Runnable {
 		return queue;
 	}
 
+	/**
+	 * Makes the service accept new frames that need to be drawn again.
+	 */
 	public void start() {
-		shouldEnd = false;
+		acceptTasks = false;
 
-		for (Thread t : threads) {
-			t.start();
+		if (!threadsStarted) {
+			for (Thread t : threads) {
+				t.start();
+			}
 		}
+		threadsStarted= true;
 	}
 
+	/**
+	 * "Stops" the rendering threads from doing their work. This will not actually stop the threads
+	 * but they will idle while waiting for new frames, which don't occur if the service is stopped.
+	 * That state does not consume many resources.
+	 */
 	public void stop() {
-		shouldEnd = true;
-
-		for (Thread t : threads) {
-			t.interrupt();
-		}
+		queue.clearBacklog();
+		acceptTasks = true;
 	}
 
 	public void markDirty(FluttieAnimation animation) {
-		if (!shouldEnd) {
+		if (!acceptTasks) {
 			queue.scheduleDrawing(animation);
 		}
 	}
 
 	@Override
 	public void run() {
-		while (!shouldEnd) {
+		while (true) {
 			try {
 				FluttieAnimation anim = queue.waitAndObtain();
 
