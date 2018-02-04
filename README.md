@@ -7,7 +7,7 @@ Android library into a Flutter texture.
 
 **Please note:** At the moment, this plugin does not support iOS devices.
 
-## Cons and Todos:
+## Things to keep in mind when using this:
  - The plugin is in an early state and there will be breaking API changes
  - No iOS support yet
  - Loading animations from files is taking quite some time at the moment as the dart
@@ -17,6 +17,9 @@ Android library into a Flutter texture.
    multiple animations can be a bit laggy. Rendering multiple animations will
    also heavily reduce your apps framerate (Using multiple threads to circumvent this has already been implemented, but [crashes Flutter](https://github.com/flutter/flutter/issues/14169)).
  - Animation widgets need a fixed size for now
+ - Do not re-use animations, as this can crash your app. Instead, save the output
+   of `loadAnimationFromResource()` and construct a new animation whenever you need
+   to.
 
 ## Getting Started
 

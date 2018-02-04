@@ -1,3 +1,7 @@
+## 0.1.1
+ * Fix crashes occuring when disposing animations
+ * Ability to unpause animations without having to restart them
+
 ## 0.1.0
  * Render small animations in high quality by using the `preferredSize`
    parameter of `Fluttie.prepareAnimation`.
