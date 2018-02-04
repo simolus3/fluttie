@@ -40,6 +40,9 @@ class FluttieAnimationController {
   /// Starts this animation from the beginning
   void start() => _handle._startAnimation(id);
 
+  /// Starts this animation from where it was last paused
+  void unpause() => _handle._resumeAnimation(id);
+
   /// Pauses the animation at its current progess
   void pause() => _handle._pauseAnimation(id);
 
@@ -140,6 +143,10 @@ class Fluttie {
 
   void _startAnimation(int id) {
     _methods.invokeMethod("startAnimation", {"id": id});
+  }
+
+  void _resumeAnimation(int id) {
+    _methods.invokeMethod("resumeAnimation", {"id": id});
   }
 
   void _pauseAnimation(int id) {

@@ -149,6 +149,10 @@ public class FluttiePlugin implements MethodCallHandler, EventChannel.StreamHand
 				getManagedAnimation(call).startAnimation();
 				result.success(null);
 				return;
+			case "resumeAnimation":
+				getManagedAnimation(call).resumeAnimation();
+				result.success(null);
+				return;
 			case "pauseAnimation":
 				getManagedAnimation(call).pauseAnimation();
 				result.success(null);
@@ -194,9 +198,24 @@ public class FluttiePlugin implements MethodCallHandler, EventChannel.StreamHand
 		OnCompositionLoadedListener listener = new OnCompositionLoadedListener() {
 			@Override
 			public void onCompositionLoaded(@Nullable LottieComposition composition) {
-				loadedCompositions.append(requestId, composition);
-
 				try {
+					if (composition == null) {
+						Log.w("FluttiePlugin", "Could not load composition");
+
+						object.put("success", false);
+						writeToSink(object);
+						return;
+					}
+
+					if (!composition.getWarnings().isEmpty()) {
+						Log.w("FluttiePlugin", "You tried to load a composition that has some warnings, it might not be displayed correctly");
+						for (String warning : composition.getWarnings()) {
+							Log.w("FluttiePlugin", warning);
+						}
+					}
+
+					loadedCompositions.append(requestId, composition);
+
 					object.put("success", true);
 				} catch (JSONException e) {
 					Log.w("FluttiePlugin", "Could not add JSON value to event stream");
