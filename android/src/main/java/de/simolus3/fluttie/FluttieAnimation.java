@@ -5,6 +5,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
+import android.util.Log;
 import android.support.annotation.Nullable;
 import android.view.Surface;
 
@@ -20,9 +21,8 @@ public class FluttieAnimation implements ValueAnimator.AnimatorUpdateListener {
 	private final FluttiePlugin plugin;
 	private final TextureRegistry.SurfaceTextureEntry surfaceTexture;
 
-	private boolean playing;
-
 	private boolean pausedButNotByUser;
+	private volatile boolean isDisposed;
 
 	private LottieComposition composition;
 	private LottieDrawable drawable;
@@ -36,7 +36,7 @@ public class FluttieAnimation implements ValueAnimator.AnimatorUpdateListener {
 		surface = new Surface(surfaceTexture.surfaceTexture());
 		Rect bounds = composition.getBounds();
 		surfaceTexture.surfaceTexture().setDefaultBufferSize(
-				(int) scale * bounds.width(), (int) scale * bounds.height());
+				(int) (scale * bounds.width()), (int) (scale * bounds.height()));
 
 		drawable = new LottieDrawable();
 		drawable.setScale(scale);
@@ -63,17 +63,42 @@ public class FluttieAnimation implements ValueAnimator.AnimatorUpdateListener {
 	}
 
 	public Canvas lockCanvas() {
-		return surface.lockCanvas(null);
+		//Can throw if there if flutter decided not to show the widget anymore
+		//in which case surface.lockCanvas() will fail...
+		try {
+			return surface.isValid() && !isDisposed ? surface.lockCanvas(null) : null;
+		} catch (Exception e) {
+			Log.w("FluttieAnimation", "Could not obtain canvas. If "
+				+ "you remembered to call FluttieAnimationController.dispose()"
+				+ ", this should not occur often and is not a problem.", e);
+		}
+
+		return null;
 	}
 
 	public void drawFrame(Canvas canvas) {
 		//would otherwise draw frames on top of older frames
-		canvas.drawColor(BACKGROUND_COLOR, PorterDuff.Mode.CLEAR);
-		drawable.draw(canvas);
+		if (!isDisposed) {
+			canvas.drawColor(BACKGROUND_COLOR, PorterDuff.Mode.CLEAR);
+			try {
+				drawable.draw(canvas);
+			} catch (NullPointerException e) {
+				Log.d("FluttieAnimation", "Could not draw. Disposed: " + isDisposed, e);
+			}
+		}
 	}
 
 	public void unlockCanvasAndPost(Canvas canvas) {
-		surface.unlockCanvasAndPost(canvas);
+		//IllegalArgumentException thrown if the animation has been disposed in
+		//flutter before we received the message telling us to stop rendering
+		//it. There isn't really anything that we could do against it, so ignore
+		try {
+			surface.unlockCanvasAndPost(canvas);
+		} catch (Exception e) {
+			Log.w("FluttieAnimation", "Could not send canvas to flutter. If "
+				+ "you remembered to call FluttieAnimationController.dispose()"
+				+ ", this should not occur often and is not a problem.", e);
+		}
 	}
 
 	@Override
@@ -82,7 +107,7 @@ public class FluttieAnimation implements ValueAnimator.AnimatorUpdateListener {
 	}
 
 	public boolean isPlaying() {
-		return playing;
+		return drawable.isAnimating();
 	}
 
 	public boolean isPausedButNotByUser() {
@@ -96,26 +121,25 @@ public class FluttieAnimation implements ValueAnimator.AnimatorUpdateListener {
 	public void startAnimation() {
 		stopAnimation(true);
 		drawable.start();
-		playing = true;
 	}
 
 	public void resumeAnimation() {
 		drawable.resumeAnimation();
-		playing = true;
 	}
 
 	public void pauseAnimation() {
 		drawable.pauseAnimation();
-		playing = false;
 	}
 
 	public void stopAnimation(boolean resetToStart) {
 		drawable.stop();
 		drawable.setProgress(resetToStart ? 0 : 1);
-		playing = false;
 	}
 
 	public void stopAndRelease() {
+		Log.d("FluttieAnimation", "Disposing animation with id " + getId());
+
+		isDisposed = true;
 		stopAnimation(false);
 
 		drawable.clearComposition();

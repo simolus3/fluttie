@@ -64,15 +64,21 @@ public class RenderingThreads implements Runnable {
 	@Override
 	public void run() {
 		while (true) {
+			FluttieAnimation anim = null;
 			try {
-				FluttieAnimation anim = queue.waitAndObtain();
+				anim = queue.waitAndObtain();
 
 				Canvas canvas = anim.lockCanvas();
+				if (canvas == null) //Animation decided not to be drawn at this time
+					continue;
+
 				anim.drawFrame(canvas);
 				anim.unlockCanvasAndPost(canvas);
-
-				queue.markCompleted(anim);
 			} catch (InterruptedException ignore) {}
+			finally {
+				if (anim != null)
+					queue.markCompleted(anim);
+			}
 		}
 	}
 }
