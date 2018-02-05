@@ -1,6 +1,7 @@
 package de.simolus3.fluttie;
 
 import android.graphics.Canvas;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +20,7 @@ public class RenderingThreads implements Runnable {
 	private RenderingQueue queue = new RenderingQueue();
 
 	private boolean threadsStarted = false;
-	private boolean acceptTasks = false;
+	private volatile boolean dontAcceptTasks = false;
 
 	public RenderingThreads(int amount) {
 		for (int i = 0; i < amount; i++) {
@@ -35,14 +36,16 @@ public class RenderingThreads implements Runnable {
 	 * Makes the service accept new frames that need to be drawn again.
 	 */
 	public void start() {
-		acceptTasks = false;
+		dontAcceptTasks = false;
+		Log.d("RenderingThreads", "RenderingThreads now accepting tasks again");
 
 		if (!threadsStarted) {
 			for (Thread t : threads) {
 				t.start();
 			}
+
+			threadsStarted = true;
 		}
-		threadsStarted= true;
 	}
 
 	/**
@@ -51,12 +54,13 @@ public class RenderingThreads implements Runnable {
 	 * That state does not consume many resources.
 	 */
 	public void stop() {
+		Log.d("RenderingThreads", "Stopped rendering threads");
 		queue.clearBacklog();
-		acceptTasks = true;
+		dontAcceptTasks = true;
 	}
 
 	public void markDirty(FluttieAnimation animation) {
-		if (!acceptTasks) {
+		if (!dontAcceptTasks) {
 			queue.scheduleDrawing(animation);
 		}
 	}

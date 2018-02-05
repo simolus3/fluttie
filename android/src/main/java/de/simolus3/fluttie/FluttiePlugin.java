@@ -240,13 +240,21 @@ public class FluttiePlugin implements MethodCallHandler, EventChannel.StreamHand
 
 	@Override
 	public void onActivityStarted(Activity activity) {
+		if (activity != registrar.activity())
+			return;
+		
+		Log.d("FluttiePlugin", "Activity restarted!");
 		if (renderingThreads != null) {
+			Log.d("FluttiePlugin", "Starting rendering threads");
 			renderingThreads.start();
 		}
 	}
 
 	@Override
 	public void onActivityResumed(Activity activity) {
+		if (activity != registrar.activity())
+			return;
+		
 		for (FluttieAnimation anim : getAllManagedAnimations()) {
 			if (anim.isPausedButNotByUser()) {
 				anim.setPausedButNotByUser(false);
@@ -257,6 +265,9 @@ public class FluttiePlugin implements MethodCallHandler, EventChannel.StreamHand
 
 	@Override
 	public void onActivityPaused(Activity activity) {
+		if (activity != registrar.activity())
+			return;
+
 		for (FluttieAnimation anim : getAllManagedAnimations()) {
 			if (anim.isPlaying()) {
 				anim.pauseAnimation();
@@ -267,6 +278,9 @@ public class FluttiePlugin implements MethodCallHandler, EventChannel.StreamHand
 
 	@Override
 	public void onActivityStopped(Activity activity) {
+		if (activity != registrar.activity())
+			return;
+		
 		renderingThreads.stop();
 	}
 
