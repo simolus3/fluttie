@@ -1,3 +1,7 @@
+## 0.1.2
+ * Make the plugin only react to activity lifecircle changes that involve the
+   main flutter activity.
+
 ## 0.1.1
  * Fix crashes occuring when disposing animations
  * Ability to unpause animations without having to restart them
