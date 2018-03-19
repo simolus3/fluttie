@@ -14,7 +14,6 @@ which might be handy when deciding what animations to use.
 **Please note:** At the moment, this plugin does not support iOS devices.
 
 ## Things to keep in mind when using this:
- - The plugin is in an early state and there will be breaking API changes
  - No iOS support yet
  - Loading animations from files is taking quite some time at the moment as the dart
    code needs to send the full animation declaration to the plugin. When
@@ -42,7 +41,7 @@ Place the file in an folder inside your project and add it in the `assets` part 
 If you haven't already done so, add Fluttie to your projects `dependencies`:
 ```yaml
 dependencies:
-  fluttie: ^0.1.2
+  fluttie: ^0.2
 ```
 In order to display animations in Flutter, you will have the plugin to load
 a composition first:

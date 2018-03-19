@@ -1,3 +1,6 @@
+## 0.2
+ * Make plugin ready for dart 2.
+
 ## 0.1.2
  * Make the plugin only react to activity lifecircle changes that involve the
    main flutter activity.
