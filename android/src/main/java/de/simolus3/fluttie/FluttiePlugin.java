@@ -3,6 +3,7 @@ package de.simolus3.fluttie;
 import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.app.Application;
+import android.content.res.AssetManager;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -14,6 +15,8 @@ import com.airbnb.lottie.OnCompositionLoadedListener;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -228,6 +231,19 @@ public class FluttiePlugin implements MethodCallHandler, EventChannel.StreamHand
 		switch (sourceType) {
 			case "inline":
 				LottieComposition.Factory.fromJsonString(source, listener);
+				break;
+			case "resource":
+				AssetManager assets = registrar.context().getAssets();
+				String key = registrar.lookupKeyForAsset(source);
+
+				InputStream stream = null;
+				try {
+					stream = assets.open(key);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				// Lottie will close the input stream for us
+				LottieComposition.Factory.fromInputStream(stream, listener);
 				break;
 			default:
 				object.put("success", false);
