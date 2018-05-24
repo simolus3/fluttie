@@ -15,10 +15,6 @@ which might be handy when deciding what animations to use.
 
 ## Things to keep in mind when using this:
  - No iOS support yet
- - Loading animations from files is taking quite some time at the moment as the dart
-   code needs to send the full animation declaration to the plugin. When
-   [this issue](https://github.com/flutter/flutter/issues/11019) gets fixed, it might be faster.
-   The time required also seems to be a lot shorter in non-debug builds.
  - Due to a delay between the dart code and the native backend, controlling
    multiple animations can be a bit laggy. Rendering multiple animations will
    also heavily reduce your apps framerate (Using multiple threads to circumvent this has already been implemented, but [crashes Flutter](https://github.com/flutter/flutter/issues/14169)).
@@ -36,35 +32,43 @@ which might be handy when deciding what animations to use.
 In order to use animations with fluttie, you will need a json file
 containing the composition for your animation. You can either export it using
 an AfterEffects plugin (see [instructions](http://airbnb.io/lottie/after-effects/getting-started.html))
-or grab some at [lottiefiles.com](https://www.lottiefiles.com/).
-Place the file in an folder inside your project and add it in the `assets` part of your `pubspec.yaml`.
-If you haven't already done so, add Fluttie to your projects `dependencies`:
+or grab some at [lottiefiles.com](https://www.lottiefiles.com/). A
+composition is a JSON file that describes everything in your animation,
+like the different shapes, colors and movements.
+Place the file in an folder inside your project and add it in the
+`assets` part of your `pubspec.yaml`, like its done [here](https://github.com/simolus3/fluttie/blob/master/example/pubspec.yaml#L29-L31).
+If you haven't already done so, also add Fluttie to your projects' `dependencies`:
 ```yaml
 dependencies:
   fluttie: ^0.2
 ```
-In order to display animations in Flutter, you will have the plugin to load
-a composition first:
+In order to display animations in Flutter, you will have the plugin load
+a composition first. The plugin will parse the composition file so
+that it can quickly display the animation later on.
 ```dart
 var instance = new Fluttie();
 var myComposition = await instance.loadAnimationFromResource(
-    "resources/animations/emoji.json", //replace with your asset file
-    bundle: DefaultAssetBundle.of(yourBuildContext)
+    "resources/animations/emoji.json", //Replace this string with your actual file
 );
 ```
-You can then use that composition to create a new `AnimationController`,
-like this:
+In order to actually show the animation on screen, two parts are neccessary:
+An `AnimationController`, which controls the instance of the animation
+and contains methods to pause and resume it, and finally a widget displaying
+the animation contained by the controller.
 ```dart
+// This creates the controller
 emojiAnimation = await instance.prepareAnimation(emojiComposition)
 ```
 You can also set the duration of your animation and configure looping while
-preparing the animation by using the optional parameters of `prepareAnimation`.
+preparing the animation by using the optional parameters of `prepareAnimation`, see
+the docs fore more details.
 After having your animation controller ready, you can include it as a widget:
 ```dart
 Widget build(BuildContext context) =>
     new FluttieAnimation(emojiAnimation)
 ```
-Don't forget to start your animation by calling `emojiAnimation.start()`!
+Don't forget to start your animation by calling `emojiAnimation.start()`
+on your controller!
 
 ## Questions and bugs
 
