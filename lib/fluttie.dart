@@ -171,8 +171,8 @@ class Fluttie {
   ///
   /// Please notice that using the bundle parameter is no longer required as the
   /// plugin now uses loads the resource from the OEM side as intended.
-  Future<int> loadAnimationFromResource(String key,
-      {@deprecated AssetBundle bundle}) => _loadAnimation("resource", key);
+  Future<int> loadAnimationFromAsset(String key,
+      {@deprecated AssetBundle bundle}) => _loadAnimation("asset", key);
 
   Future<int> _loadAnimation(String sourceType, String data) async {
     int requestId = await _methods.invokeMethod(

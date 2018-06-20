@@ -20,7 +20,7 @@ which might be handy when deciding what animations to use.
    also heavily reduce your apps framerate (Using multiple threads to circumvent this has already been implemented, but [crashes Flutter](https://github.com/flutter/flutter/issues/14169)).
  - Animation widgets need a fixed size for now
  - Do not re-use animations, as this can crash your app. Instead, save the output
-   of `loadAnimationFromResource()` and construct a new animation whenever you need
+   of `loadAnimationFromAsset()` and construct a new animation whenever you need
    to.
 
 ## Getting Started
@@ -47,8 +47,8 @@ a composition first. The plugin will parse the composition file so
 that it can quickly display the animation later on.
 ```dart
 var instance = new Fluttie();
-var myComposition = await instance.loadAnimationFromResource(
-    "resources/animations/emoji.json", //Replace this string with your actual file
+var myComposition = await instance.loadAnimationFromAsset(
+    "assets/animations/emoji.json", //Replace this string with your actual file
 );
 ```
 In order to actually show the animation on screen, two parts are neccessary:

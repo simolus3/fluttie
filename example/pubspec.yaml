@@ -27,8 +27,8 @@ flutter:
   # the material Icons class.
   uses-material-design: true
   assets:
-    - resources/animations/star.json
-    - resources/emoji_shock.json
+    - assets/animations/star.json
+    - assets/emoji_shock.json
 
   # To add assets to your application, add an assets section, like this:
   # assets:
