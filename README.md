@@ -57,7 +57,7 @@ and contains methods to pause and resume it, and finally a widget displaying
 the animation contained by the controller.
 ```dart
 // This creates the controller
-emojiAnimation = await instance.prepareAnimation(emojiComposition)
+var emojiAnimation = await instance.prepareAnimation(emojiComposition)
 ```
 You can also set the duration of your animation and configure looping while
 preparing the animation by using the optional parameters of `prepareAnimation`, see
