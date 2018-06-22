@@ -40,7 +40,7 @@ Place the file in an folder inside your project and add it in the
 If you haven't already done so, also add Fluttie to your projects' `dependencies`:
 ```yaml
 dependencies:
-  fluttie: ^0.2
+  fluttie: "^0.2.2"
 ```
 In order to display animations in Flutter, you will have the plugin load
 a composition first. The plugin will parse the composition file so
