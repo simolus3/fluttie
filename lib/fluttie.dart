@@ -171,8 +171,17 @@ class Fluttie {
   ///
   /// Please notice that using the bundle parameter is no longer required as the
   /// plugin now uses loads the resource from the OEM side as intended.
+  Future<int> loadAnimationFromAsset(String key) => _loadAnimation("asset", key);
+
+  /// Load the composition of an animation from an asset bundle and return the
+  /// id of the animation parsed.
+  /// 
+  /// Deprecated: To better align this plugin with the terminology used by
+  /// Flutter, "resource" has been changed to "asset", so please use
+  /// [loadAnimationFromAsset] instead.
+  @deprecated
   Future<int> loadAnimationFromResource(String key,
-      {@deprecated AssetBundle bundle}) => _loadAnimation("resource", key);
+    {@deprecated AssetBundle bundle}) => loadAnimationFromAsset(key);
 
   Future<int> _loadAnimation(String sourceType, String data) async {
     int requestId = await _methods.invokeMethod(

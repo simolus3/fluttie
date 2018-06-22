@@ -17,10 +17,10 @@ which might be handy when deciding what animations to use.
  - No iOS support yet
  - Due to a delay between the dart code and the native backend, controlling
    multiple animations can be a bit laggy. Rendering multiple animations will
-   also heavily reduce your apps framerate (Using multiple threads to circumvent this has already been implemented, but [crashes Flutter](https://github.com/flutter/flutter/issues/14169)).
+   reduce your app's framerate.
  - Animation widgets need a fixed size for now
  - Do not re-use animations, as this can crash your app. Instead, save the output
-   of `loadAnimationFromResource()` and construct a new animation whenever you need
+   of `loadAnimationFromAsset()` and construct a new animation whenever you need
    to.
 
 ## Getting Started
@@ -40,15 +40,15 @@ Place the file in an folder inside your project and add it in the
 If you haven't already done so, also add Fluttie to your projects' `dependencies`:
 ```yaml
 dependencies:
-  fluttie: ^0.2
+  fluttie: ^0.2.3
 ```
 In order to display animations in Flutter, you will have the plugin load
 a composition first. The plugin will parse the composition file so
 that it can quickly display the animation later on.
 ```dart
 var instance = new Fluttie();
-var myComposition = await instance.loadAnimationFromResource(
-    "resources/animations/emoji.json", //Replace this string with your actual file
+var myComposition = await instance.loadAnimationFromAsset(
+    "assets/animations/emoji.json", //Replace this string with your actual file
 );
 ```
 In order to actually show the animation on screen, two parts are neccessary:
@@ -75,4 +75,4 @@ on your controller!
 As the library is in an early version, there will be things not working like
 they should. If you encounter a bug, have a question or want some features implemented,
 please don't hesitate to [create an issue](https://github.com/simolus3/fluttie/issues/new).
-Of course, would absolutely appreciate any contributions as pull requests.
+Of course, I would absolutely appreciate any contributions as pull requests.

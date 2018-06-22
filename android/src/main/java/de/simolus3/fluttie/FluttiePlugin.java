@@ -232,7 +232,7 @@ public class FluttiePlugin implements MethodCallHandler, EventChannel.StreamHand
 			case "inline":
 				LottieComposition.Factory.fromJsonString(source, listener);
 				break;
-			case "resource":
+			case "asset":
 				AssetManager assets = registrar.context().getAssets();
 				String key = registrar.lookupKeyForAsset(source);
 

@@ -61,8 +61,8 @@ class _MyAppState extends State<MyApp> {
     var instance = new Fluttie();
     
     // Load our first composition for the emoji animation
-    var emojiComposition = await instance.loadAnimationFromResource(
-      "resources/animations/emoji_shock.json");
+    var emojiComposition = await instance.loadAnimationFromAsset(
+      "assets/animations/emoji_shock.json");
     // And prepare its animation, which should loop infinitely and take 2s per
     // iteration. Instead of RepeatMode.START_OVER, we could have choosen 
     // REVERSE, which would play the animation in reverse on every second iteration.
@@ -72,8 +72,8 @@ class _MyAppState extends State<MyApp> {
 
     // Load the composition for our star animation. Notice how we only have to
     // load the composition once, even though we're using it for 5 animations!
-    var composition = await instance.loadAnimationFromResource(
-      "resources/animations/star.json");
+    var composition = await instance.loadAnimationFromAsset(
+      "assets/animations/star.json");
 
     // Create the star animation with the default setting. 5 times. The
     // preferredSize needs to be set because the original star animation is quite
