@@ -47,7 +47,7 @@ a composition first. The plugin will parse the composition file so
 that it can quickly display the animation later on.
 ```dart
 var instance = new Fluttie();
-var myComposition = await instance.loadAnimationFromAsset(
+var emojiComposition = await instance.loadAnimationFromAsset(
     "assets/animations/emoji.json", //Replace this string with your actual file
 );
 ```
