@@ -39,6 +39,7 @@ public class FluttieAnimation implements ValueAnimator.AnimatorUpdateListener {
 				(int) (scale * bounds.width()), (int) (scale * bounds.height()));
 
 		drawable = new LottieDrawable();
+		drawable.setCallback(plugin.getAnimationCallback());
 		drawable.setScale(scale);
 		this.composition = composition;
 		drawable.setComposition(composition);

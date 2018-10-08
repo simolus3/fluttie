@@ -3,6 +3,7 @@ package de.simolus3.fluttie;
 import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.app.Application;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.SparseArray;
@@ -68,6 +69,10 @@ public class FluttiePlugin implements MethodCallHandler, EventChannel.StreamHand
 		 */
 		renderingThreads = new RenderingThreads(1);
 		renderingThreads.start();
+	}
+
+	Drawable.Callback getAnimationCallback() {
+		return registrar.view();
 	}
 
 	private List<FluttieAnimation> getAllManagedAnimations() {
