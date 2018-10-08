@@ -3,19 +3,17 @@ package de.simolus3.fluttie;
 import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.app.Application;
-import android.content.res.AssetManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.SparseArray;
 
 import com.airbnb.lottie.LottieComposition;
-import com.airbnb.lottie.OnCompositionLoadedListener;
+import com.airbnb.lottie.LottieCompositionFactory;
+import com.airbnb.lottie.LottieListener;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -198,9 +196,9 @@ public class FluttiePlugin implements MethodCallHandler, EventChannel.StreamHand
 		object.put("request_id", requestId);
 		object.put("event_type", "load_composition");
 
-		OnCompositionLoadedListener listener = new OnCompositionLoadedListener() {
+		LottieListener<LottieComposition> listener = new LottieListener<LottieComposition>() {
 			@Override
-			public void onCompositionLoaded(@Nullable LottieComposition composition) {
+			public void onResult(@Nullable LottieComposition composition) {
 				try {
 					if (composition == null) {
 						Log.w("FluttiePlugin", "Could not load composition");
@@ -227,23 +225,24 @@ public class FluttiePlugin implements MethodCallHandler, EventChannel.StreamHand
 				writeToSink(object);
 			}
 		};
+		LottieListener<Throwable> failure = new LottieListener<Throwable>() {
+			@Override
+			public void onResult(Throwable result) {
+				Log.e("FluttiePlugin", "Failure loading resource: " + result);
+			}
+		};
 
 		switch (sourceType) {
 			case "inline":
-				LottieComposition.Factory.fromJsonString(source, listener);
+				LottieCompositionFactory.fromJsonString(source, null)
+						.addListener(listener)
+						.addFailureListener(failure);
 				break;
 			case "asset":
-				AssetManager assets = registrar.context().getAssets();
 				String key = registrar.lookupKeyForAsset(source);
-
-				InputStream stream = null;
-				try {
-					stream = assets.open(key);
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-				// Lottie will close the input stream for us
-				LottieComposition.Factory.fromInputStream(stream, listener);
+				LottieCompositionFactory.fromAsset(registrar.context(), key)
+						.addListener(listener)
+						.addFailureListener(failure);
 				break;
 			default:
 				object.put("success", false);
