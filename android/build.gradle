@@ -22,7 +22,7 @@ rootProject.allprojects {
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 27
+    compileSdkVersion 28
 
     defaultConfig {
         minSdkVersion 16
@@ -34,5 +34,5 @@ android {
 }
 
 dependencies {
-    implementation 'com.airbnb.android:lottie:2.5.3'
+    implementation 'com.airbnb.android:lottie:2.8.0'
 }
