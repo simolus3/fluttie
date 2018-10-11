@@ -6,12 +6,12 @@ import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.util.Log;
-import android.support.annotation.Nullable;
 import android.view.Surface;
 
 import com.airbnb.lottie.LottieComposition;
 import com.airbnb.lottie.LottieDrawable;
 
+import androidx.annotation.Nullable;
 import io.flutter.view.TextureRegistry;
 
 public class FluttieAnimation implements ValueAnimator.AnimatorUpdateListener {
@@ -29,7 +29,7 @@ public class FluttieAnimation implements ValueAnimator.AnimatorUpdateListener {
 
 	private Surface surface;
 
-	public FluttieAnimation(FluttiePlugin plugin, TextureRegistry.SurfaceTextureEntry surfaceTexture, LottieComposition composition, float scale) {
+	FluttieAnimation(FluttiePlugin plugin, TextureRegistry.SurfaceTextureEntry surfaceTexture, LottieComposition composition, float scale) {
 		this.plugin = plugin;
 		this.surfaceTexture = surfaceTexture;
 
@@ -39,6 +39,7 @@ public class FluttieAnimation implements ValueAnimator.AnimatorUpdateListener {
 				(int) (scale * bounds.width()), (int) (scale * bounds.height()));
 
 		drawable = new LottieDrawable();
+		drawable.setCallback(plugin.getAnimationCallback());
 		drawable.setScale(scale);
 		this.composition = composition;
 		drawable.setComposition(composition);
