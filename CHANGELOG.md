@@ -1,3 +1,7 @@
+## 0.3
+ * Updated the Lottie libray used, thus giving you access to the latest
+   features including image support in animations. Thank you, [@kristoffer-zliide](https://github.com/kristoffer-zliide), for implementing this!
+
 ## 0.2
  * Make plugin ready for dart 2.
 
