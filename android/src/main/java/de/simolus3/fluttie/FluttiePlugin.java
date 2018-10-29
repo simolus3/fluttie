@@ -4,6 +4,7 @@ import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.app.Application;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.SparseArray;
@@ -91,7 +92,7 @@ public class FluttiePlugin implements MethodCallHandler, Application.ActivityLif
 	public void onMethodCall(MethodCall call, Result result) {
 		switch (call.method) {
 			case "isAvailable":
-				result.success(true);
+				result.success(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP);
 				return;
 			case "loadAnimation":
 				String sourceType = call.argument("source_type");
