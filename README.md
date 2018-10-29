@@ -46,7 +46,7 @@ In order to display animations in Flutter, you will have the plugin load
 a composition first. The plugin will parse the composition file so
 that it can quickly display the animation later on.
 ```dart
-var instance = new Fluttie();
+var instance = Fluttie();
 var emojiComposition = await instance.loadAnimationFromAsset(
     "assets/animations/emoji.json", //Replace this string with your actual file
 );
@@ -65,7 +65,7 @@ the docs fore more details.
 After having your animation controller ready, you can include it as a widget:
 ```dart
 Widget build(BuildContext context) =>
-    new FluttieAnimation(emojiAnimation)
+    FluttieAnimation(emojiAnimation)
 ```
 Don't forget to start your animation by calling `emojiAnimation.start()`
 on your controller!

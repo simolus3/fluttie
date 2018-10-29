@@ -83,7 +83,7 @@ public class FluttiePlugin implements MethodCallHandler, Application.ActivityLif
 		return managedAnimations.get(id);
 	}
 
-	public RenderingThreads getRenderingThreads() {
+	RenderingThreads getRenderingThreads() {
 		return renderingThreads;
 	}
 

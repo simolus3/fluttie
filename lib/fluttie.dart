@@ -20,10 +20,10 @@ class FluttieAnimation extends StatelessWidget {
 
   Widget build(BuildContext ctx) {
     return data == null
-        ? new Container()
-        : new Container(
-            constraints: new BoxConstraints.loose(size),
-            child: new Texture(textureId: data.id));
+        ? Container()
+        : Container(
+            constraints: BoxConstraints.loose(size),
+            child: Texture(textureId: data.id));
   }
 }
 
@@ -129,7 +129,7 @@ class Fluttie {
       "pref_size_w": scale * (preferredSize?.width ?? -1.0),
     });
 
-    return new FluttieAnimationController(animId, this);
+    return FluttieAnimationController(animId, this);
   }
 
   void _startAnimation(int id) {
