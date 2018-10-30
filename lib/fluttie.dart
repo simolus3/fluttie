@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert' show json;
 import 'dart:ui' show window;
 
 import 'package:flutter/widgets.dart';
@@ -21,10 +20,10 @@ class FluttieAnimation extends StatelessWidget {
 
   Widget build(BuildContext ctx) {
     return data == null
-        ? new Container()
-        : new Container(
-            constraints: new BoxConstraints.loose(size),
-            child: new Texture(textureId: data.id));
+        ? Container()
+        : Container(
+            constraints: BoxConstraints.loose(size),
+            child: Texture(textureId: data.id));
   }
 }
 
@@ -100,17 +99,8 @@ class Fluttie {
   }
 
   static const MethodChannel _methods = const MethodChannel("fluttie/methods");
-  static const EventChannel _events = const EventChannel("fluttie/events");
 
-  /// Needs to be used as the result of loading animations will be returned over
-  /// the event channel instead of the method communication.
-  Map<int, Completer<int>> _pendingAnimationLoaders = {};
-
-  Fluttie() {
-    _events.receiveBroadcastStream().listen(_onData);
-  }
-
-  /// Given the composition of an animation to display, create a new animation
+  /// Given the composition of an animation to display, create a animation
   /// with detailed settings like its duration or how it should repeat.
   ///
   /// The parameter preferredSize controls the size at which the animation
@@ -139,7 +129,7 @@ class Fluttie {
       "pref_size_w": scale * (preferredSize?.width ?? -1.0),
     });
 
-    return new FluttieAnimationController(animId, this);
+    return FluttieAnimationController(animId, this);
   }
 
   void _startAnimation(int id) {
@@ -184,28 +174,7 @@ class Fluttie {
     {@deprecated AssetBundle bundle}) => loadAnimationFromAsset(key);
 
   Future<int> _loadAnimation(String sourceType, String data) async {
-    int requestId = await _methods.invokeMethod(
+    return await _methods.invokeMethod(
         "loadAnimation", {"source_type": sourceType, "source": data});
-
-    var completer = new Completer<int>();
-    _pendingAnimationLoaders[requestId] = completer;
-
-    return completer.future;
-  }
-
-  void _onData(dynamic data) {
-    data = json.decode(data);
-
-    if (data["event_type"] == "load_composition") {
-      int requestId = data["request_id"];
-      var completer = _pendingAnimationLoaders[requestId];
-
-      if (data["success"])
-        completer.complete(requestId);
-      else
-        completer.completeError("Could not load animation");
-
-      _pendingAnimationLoaders.remove(requestId);
-    }
   }
 }

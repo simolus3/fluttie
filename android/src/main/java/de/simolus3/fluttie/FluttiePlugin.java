@@ -4,6 +4,7 @@ import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.app.Application;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.SparseArray;
@@ -12,15 +13,11 @@ import com.airbnb.lottie.LottieComposition;
 import com.airbnb.lottie.LottieCompositionFactory;
 import com.airbnb.lottie.LottieListener;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import androidx.annotation.Nullable;
-import io.flutter.plugin.common.EventChannel;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
@@ -28,7 +25,7 @@ import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.PluginRegistry.Registrar;
 import io.flutter.view.TextureRegistry;
 
-public class FluttiePlugin implements MethodCallHandler, EventChannel.StreamHandler, Application.ActivityLifecycleCallbacks {
+public class FluttiePlugin implements MethodCallHandler, Application.ActivityLifecycleCallbacks {
 	
 	public static void registerWith(Registrar registrar) {
 		FluttiePlugin plugin = new FluttiePlugin(registrar);
@@ -36,7 +33,6 @@ public class FluttiePlugin implements MethodCallHandler, EventChannel.StreamHand
 	}
 
 	private Registrar registrar;
-	private EventChannel.EventSink sink;
 
 	private SparseArray<FluttieAnimation> managedAnimations = new SparseArray<>();
 
@@ -51,10 +47,8 @@ public class FluttiePlugin implements MethodCallHandler, EventChannel.StreamHand
 
 	private void setUp() {
 		final MethodChannel channel = new MethodChannel(registrar.messenger(), "fluttie/methods");
-		final EventChannel eventChannel = new EventChannel(registrar.messenger(), "fluttie/events");
 
 		channel.setMethodCallHandler(this);
-		eventChannel.setStreamHandler(this);
 
 		registrar.activity().getApplication().registerActivityLifecycleCallbacks(this);
 
@@ -90,7 +84,7 @@ public class FluttiePlugin implements MethodCallHandler, EventChannel.StreamHand
 		return managedAnimations.get(id);
 	}
 
-	public RenderingThreads getRenderingThreads() {
+	RenderingThreads getRenderingThreads() {
 		return renderingThreads;
 	}
 
@@ -98,19 +92,14 @@ public class FluttiePlugin implements MethodCallHandler, EventChannel.StreamHand
 	public void onMethodCall(MethodCall call, Result result) {
 		switch (call.method) {
 			case "isAvailable":
-				result.success(true);
+				result.success(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP);
 				return;
 			case "loadAnimation":
 				String sourceType = call.argument("source_type");
 				String sourceData = call.argument("source");
 
 				int requestId = compositionRequestCounter.getAndIncrement();
-				try {
-					loadComposition(requestId, sourceType, sourceData);
-					result.success(requestId);
-				} catch (JSONException e) {
-					result.error("internal", "Could not load composition", e);
-				}
+				loadComposition(requestId, sourceType, sourceData, result);
 
 				break;
 			case "prepareAnimation":
@@ -181,35 +170,14 @@ public class FluttiePlugin implements MethodCallHandler, EventChannel.StreamHand
 		}
 	}
 
-	@Override
-	public void onListen(Object o, EventChannel.EventSink eventSink) {
-		this.sink = eventSink;
-	}
-
-	@Override
-	public void onCancel(Object o) {
-		this.sink = null;
-	}
-
-	private void writeToSink(JSONObject msg) {
-		if (sink != null)
-			sink.success(msg.toString());
-	}
-
-	private void loadComposition(final int requestId, String sourceType, String source) throws JSONException {
-		final JSONObject object = new JSONObject();
-		object.put("request_id", requestId);
-		object.put("event_type", "load_composition");
-
+	private void loadComposition(final int requestId, String sourceType, String source, final Result result) {
 		LottieListener<LottieComposition> listener = new LottieListener<LottieComposition>() {
 			@Override
 			public void onResult(@Nullable LottieComposition composition) {
 				try {
 					if (composition == null) {
-						Log.w("FluttiePlugin", "Could not load composition");
-
-						object.put("success", false);
-						writeToSink(object);
+						Log.e("FluttiePlugin", "Could not load composition");
+						result.error("Could not load composition", "CompositionLoadError", null);
 						return;
 					}
 
@@ -222,12 +190,11 @@ public class FluttiePlugin implements MethodCallHandler, EventChannel.StreamHand
 
 					loadedCompositions.append(requestId, composition);
 
-					object.put("success", true);
-				} catch (JSONException e) {
-					Log.w("FluttiePlugin", "Could not add JSON value to event stream");
+					result.success(requestId);
+				} catch (Throwable e) {
+					Log.e("FluttiePlugin", "Could not add JSON value to event stream");
+					result.error(e.getMessage(), "CompositionLoadError", null);
 				}
-
-				writeToSink(object);
 			}
 		};
 		LottieListener<Throwable> failure = new LottieListener<Throwable>() {
@@ -250,8 +217,7 @@ public class FluttiePlugin implements MethodCallHandler, EventChannel.StreamHand
 						.addFailureListener(failure);
 				break;
 			default:
-				object.put("success", false);
-				writeToSink(object);
+				result.error("Unknown source type: " + sourceType, "UnknownSourceType", null);
 		}
 	}
 

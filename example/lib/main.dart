@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:fluttie/fluttie.dart';
 
-void main() => runApp(new MyApp());
+void main() => runApp(MyApp());
 
 /// An example app showcasing the features of fluttie animations. It should
 /// show a emoji animation at the top and a bar of stars below it. When tapping
 /// on a star, all the stars to the left should be filled in a beautiful animation.
 class MyApp extends StatefulWidget {
   @override
-  _MyAppState createState() => new _MyAppState();
+  _MyAppState createState() => _MyAppState();
 }
 
 class _MyAppState extends State<MyApp> {
@@ -58,7 +58,7 @@ class _MyAppState extends State<MyApp> {
       return;
     }
 
-    var instance = new Fluttie();
+    var instance = Fluttie();
     
     // Load our first composition for the emoji animation
     var emojiComposition = await instance.loadAnimationFromAsset(
@@ -126,15 +126,15 @@ class _MyAppState extends State<MyApp> {
 
   /// Builds a widget animating the star at the specified index.
   Widget buildStar(int i) {
-    return new Flexible(
-      child: new GestureDetector(
+    return Flexible(
+      child: GestureDetector(
         onTap: () {
           // Update the amount of stars that have been selected when this star
           // is tapped.
           int amountOfStars = i + 1;
           animateStarChange(amountOfStars);
         },
-        child: new FluttieAnimation(starAnimations[i])
+        child: FluttieAnimation(starAnimations[i])
       )
     );
   }
@@ -142,12 +142,12 @@ class _MyAppState extends State<MyApp> {
   /// When we're ready to show the animations, this method will create the main
   /// content showcasing them.
   Widget buildStarContent(BuildContext context) {
-    return new Column(
+    return Column(
       children: [
         //Display the emoji animations at the top
-        new FluttieAnimation(shockedEmoji),
+        FluttieAnimation(shockedEmoji),
         //followed by a row of 5 stars that can be tapped
-        new Row(
+        Row(
           mainAxisSize: MainAxisSize.max,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -155,23 +155,23 @@ class _MyAppState extends State<MyApp> {
           ],
         ),
         // Use a Flexible widget so that the rest will be on the bottom
-        new Flexible(child: new Container()),
+        Flexible(child: Container()),
         // And display some credits showing where the animations are taken from
-        new RichText(
-          text: new TextSpan(
+        RichText(
+          text: TextSpan(
             children: [
-              new TextSpan(
+              TextSpan(
                 text: "Animations taken from ", 
                 style: Theme.of(context).textTheme.body1.copyWith(color: Colors.grey)
               ),
-              new TextSpan(
+              TextSpan(
                 text: "lottiefiles.com",
                 style: Theme.of(context).textTheme.body2
               )
             ]
           ),
         ),
-        new Padding(padding: const EdgeInsets.only(bottom: 10.0)),
+        Padding(padding: const EdgeInsets.only(bottom: 10.0)),
       ],
     );
   }
@@ -180,16 +180,16 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     // Display the main content, or - when we're not ready for that yet - a text
     // informing the user that the animations are being prepared.
-    Widget content = ready ? buildStarContent(context) : new Text("Loading animations");
+    Widget content = ready ? buildStarContent(context) : Text("Loading animations");
 
-    return new MaterialApp(
+    return MaterialApp(
       showPerformanceOverlay: this.showPerformanceOverlay,
-      home: new Scaffold(
-        appBar: new AppBar(
-          title: new Text('Fluttie example'),
+      home: Scaffold(
+        appBar: AppBar(
+          title: Text('Fluttie example'),
           actions: [
             // Button to toggle the performance overlay
-            new IconButton(
+            IconButton(
               icon: const Icon(Icons.build),
               onPressed: () {
                 setState(() {
@@ -199,7 +199,7 @@ class _MyAppState extends State<MyApp> {
             )
           ],
         ),
-        body: new Center(child: content)
+        body: Center(child: content)
       ),
     );
   }
