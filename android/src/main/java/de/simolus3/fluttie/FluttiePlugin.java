@@ -131,8 +131,10 @@ public class FluttiePlugin implements MethodCallHandler, Application.ActivityLif
 				TextureRegistry.SurfaceTextureEntry texture =
 						registrar.textures().createSurfaceTexture();
 
+				String imagesPath = call.argument("img_assets_path");
+
 				FluttieAnimation animation = new FluttieAnimation(
-						this, texture, composition, scale);
+						this, texture, composition, scale, imagesPath);
 				animation.setRepeatOptions(repeatCount, repeatMode);
 				if (durationMillis > 0)
 					animation.setDuration(durationMillis);
