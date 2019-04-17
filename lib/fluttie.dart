@@ -90,7 +90,6 @@ class RepeatCount {
 }
 
 class Fluttie {
-
   static const Size kDefaultSize = const Size.square(100.0);
 
   /// Returns true iff the backend is ready to play animations
@@ -111,12 +110,16 @@ class Fluttie {
   /// reduces that effect, it can reduce the performance of rendering animations.
   /// By default, animations won't be scaled and use the size defined in the
   /// Lottie definition, no matter at what size they will be displayed.
+  ///
+  /// If your animation contains image assets, you must explicitly specify the assets
+  /// folder in which they are located with the [imagesAssetPath] parameter.
   Future<FluttieAnimationController> prepareAnimation(
     int preparationId, {
     RepeatMode repeatMode = RepeatMode.START_OVER,
     RepeatCount repeatCount = const RepeatCount.nTimes(0),
     Duration duration,
     Size preferredSize,
+    String imagesAssetPath,
   }) async {
     var scale = window.devicePixelRatio;
 
@@ -127,6 +130,7 @@ class Fluttie {
       "duration": duration?.inMilliseconds ?? 0,
       "pref_size_h": scale * (preferredSize?.height ?? -1.0),
       "pref_size_w": scale * (preferredSize?.width ?? -1.0),
+      "img_assets_path": imagesAssetPath,
     });
 
     return FluttieAnimationController(animId, this);
@@ -161,17 +165,19 @@ class Fluttie {
   ///
   /// Please notice that using the bundle parameter is no longer required as the
   /// plugin now uses loads the resource from the OEM side as intended.
-  Future<int> loadAnimationFromAsset(String key) => _loadAnimation("asset", key);
+  Future<int> loadAnimationFromAsset(String key) =>
+      _loadAnimation("asset", key);
 
   /// Load the composition of an animation from an asset bundle and return the
   /// id of the animation parsed.
-  /// 
+  ///
   /// Deprecated: To better align this plugin with the terminology used by
   /// Flutter, "resource" has been changed to "asset", so please use
   /// [loadAnimationFromAsset] instead.
   @deprecated
   Future<int> loadAnimationFromResource(String key,
-    {@deprecated AssetBundle bundle}) => loadAnimationFromAsset(key);
+          {@deprecated AssetBundle bundle}) =>
+      loadAnimationFromAsset(key);
 
   Future<int> _loadAnimation(String sourceType, String data) async {
     return await _methods.invokeMethod(

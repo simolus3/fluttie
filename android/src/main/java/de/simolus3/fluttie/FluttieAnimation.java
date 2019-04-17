@@ -29,7 +29,7 @@ public class FluttieAnimation implements ValueAnimator.AnimatorUpdateListener {
 
 	private Surface surface;
 
-	FluttieAnimation(FluttiePlugin plugin, TextureRegistry.SurfaceTextureEntry surfaceTexture, LottieComposition composition, float scale) {
+	FluttieAnimation(FluttiePlugin plugin, TextureRegistry.SurfaceTextureEntry surfaceTexture, LottieComposition composition, float scale, String imagesAssetPath) {
 		this.plugin = plugin;
 		this.surfaceTexture = surfaceTexture;
 
@@ -43,6 +43,9 @@ public class FluttieAnimation implements ValueAnimator.AnimatorUpdateListener {
 		drawable.setScale(scale);
 		this.composition = composition;
 		drawable.setComposition(composition);
+
+		if (imagesAssetPath != null)
+			drawable.setImagesAssetsFolder("flutter_assets/" + imagesAssetPath);
 
 		drawable.addAnimatorUpdateListener(this);
 
