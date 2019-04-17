@@ -110,13 +110,16 @@ class Fluttie {
   /// reduces that effect, it can reduce the performance of rendering animations.
   /// By default, animations won't be scaled and use the size defined in the
   /// Lottie definition, no matter at what size they will be displayed.
+  ///
+  /// If your animation contains image assets, you must explicitly specify the assets
+  /// folder in which they are located with the [imagesAssetPath] parameter.
   Future<FluttieAnimationController> prepareAnimation(
     int preparationId, {
     RepeatMode repeatMode = RepeatMode.START_OVER,
     RepeatCount repeatCount = const RepeatCount.nTimes(0),
     Duration duration,
     Size preferredSize,
-    String imagesAssetPath = "",
+    String imagesAssetPath,
   }) async {
     var scale = window.devicePixelRatio;
 

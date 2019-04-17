@@ -43,7 +43,10 @@ public class FluttieAnimation implements ValueAnimator.AnimatorUpdateListener {
 		drawable.setScale(scale);
 		this.composition = composition;
 		drawable.setComposition(composition);
-		drawable.setImagesAssetsFolder("flutter_assets/" + imagesAssetPath);
+
+		if (imagesAssetPath != null)
+			drawable.setImagesAssetsFolder("flutter_assets/" + imagesAssetPath);
+
 		drawable.addAnimatorUpdateListener(this);
 
 		plugin.getRenderingThreads().markDirty(this);
