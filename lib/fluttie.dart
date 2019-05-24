@@ -51,6 +51,9 @@ class FluttieAnimationController {
   void stopAndReset({bool rewind: false}) =>
       _handle._endAnimation(id, rewind: rewind);
 
+  void _setProgress({double value: 0.0}) =>
+      _handle._setProgress(id, value: value);
+
   /// Stops the animation and disposes resources its holding in the backend.
   /// After calling this method, users should not use instances of the animation
   /// anymore, this includes not using any widgets referencing this animation.
@@ -152,8 +155,8 @@ class Fluttie {
     _methods.invokeMethod("endAnimation", {"id": id, "reset_start": rewind});
   }
   
-  void _setProgress(int id, {float value = 0.0}) {
-    _methods.invokeMethod("endAnimation", {"id": id, "value": value});
+  void _setProgress(int id, {double value = 0.0}) {
+    _methods.invokeMethod("setProgress", {"id": id, "value": value});
   }
 
   void disposeAnimation(int id) {
