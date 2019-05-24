@@ -140,7 +140,7 @@ public class FluttieAnimation implements ValueAnimator.AnimatorUpdateListener {
 		drawable.setProgress(resetToStart ? 0 : 1);
 	}
 	
-	public void setProgress(float value) {
+	public void setProgress(double value) {
 		drawable.stop();
 		drawable.setProgress(value);
 	}

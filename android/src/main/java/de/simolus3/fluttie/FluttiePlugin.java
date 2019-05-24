@@ -151,7 +151,7 @@ public class FluttiePlugin implements MethodCallHandler, Application.ActivityLif
 				result.success(null);
 				return;
 			case "setProgress":
-				boolean value = call.argument("value");
+				double value = call.argument("value");
 				getManagedAnimation(call).setProgress(value);
 				result.success(null);
 				return;
