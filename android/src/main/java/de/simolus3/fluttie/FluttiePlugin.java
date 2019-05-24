@@ -150,6 +150,11 @@ public class FluttiePlugin implements MethodCallHandler, Application.ActivityLif
 				getManagedAnimation(call).resumeAnimation();
 				result.success(null);
 				return;
+			case "setProgress":
+				boolean value = call.argument("value");
+				getManagedAnimation(call).setProgress(value);
+				result.success(null);
+				return;
 			case "pauseAnimation":
 				getManagedAnimation(call).pauseAnimation();
 				result.success(null);

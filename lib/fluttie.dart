@@ -151,6 +151,10 @@ class Fluttie {
   void _endAnimation(int id, {bool rewind = false}) {
     _methods.invokeMethod("endAnimation", {"id": id, "reset_start": rewind});
   }
+  
+  void _setProgress(int id, {float value = 0.0}) {
+    _methods.invokeMethod("endAnimation", {"id": id, "value": value});
+  }
 
   void disposeAnimation(int id) {
     _methods.invokeMethod("disposeAnimation", {"id": id});

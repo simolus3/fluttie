@@ -139,6 +139,11 @@ public class FluttieAnimation implements ValueAnimator.AnimatorUpdateListener {
 		drawable.stop();
 		drawable.setProgress(resetToStart ? 0 : 1);
 	}
+	
+	public void setProgress(float value) {
+		drawable.stop();
+		drawable.setProgress(value);
+	}
 
 	public void stopAndRelease() {
 		Log.d("FluttieAnimation", "Disposing animation with id " + getId());
