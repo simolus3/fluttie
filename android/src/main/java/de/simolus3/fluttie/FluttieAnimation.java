@@ -39,6 +39,7 @@ public class FluttieAnimation implements ValueAnimator.AnimatorUpdateListener {
 				(int) (scale * bounds.width()), (int) (scale * bounds.height()));
 
 		drawable = new LottieDrawable();
+		drawable.enableMergePathsForKitKatAndAbove(true);
 		drawable.setCallback(plugin.getAnimationCallback());
 		drawable.setScale(scale);
 		this.composition = composition;
@@ -147,7 +148,6 @@ public class FluttieAnimation implements ValueAnimator.AnimatorUpdateListener {
 		stopAnimation(false);
 
 		drawable.clearComposition();
-		drawable.recycleBitmaps();
 
 		surfaceTexture.release();
 		surface.release();

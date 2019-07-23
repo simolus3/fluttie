@@ -1,9 +1,17 @@
+## 0.4.0
+* Upgraded to lottie-android 3
+* Call `enableMergePathsForKitKatAndAbove()`
+
+## 0.3.2
+* Added support for animations with asset images. Thanks to
+  [@DeividAndreola](https://github.com/DeividAndreola) for implementing this!
+
 ## 0.3.1
  * Simplified logic to handle composition parsing to fix a race condition
  * Temporarily disable this plugin on pre-Lollipop devices. A bug in the Flutter
    engine could otherwise crash your apps. This will be reverted once a version
    with a fix lands in flutter beta.
-   
+
 Again, thanks to [@kristoffer-zliide](https://github.com/kristoffer-zliide) for
 these changes!
 
