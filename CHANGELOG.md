@@ -1,3 +1,6 @@
+## 0.5.0
+* Fix build on iOS devices (iOS still isn't supported by this plugin)
+
 ## 0.4.0
 * Upgraded to lottie-android 3
 * Call `enableMergePathsForKitKatAndAbove()`
