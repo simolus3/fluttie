@@ -11,7 +11,7 @@
 
 - (void)handleMethodCall:(FlutterMethodCall*)call result:(FlutterResult)result {
   if ([@"isAvailable" isEqualToString:call.method]) {
-    result([@NO]);
+    result(@(NO));
   } else {
     result(FlutterMethodNotImplemented);
   }
